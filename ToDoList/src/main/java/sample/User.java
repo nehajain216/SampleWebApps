@@ -5,6 +5,7 @@ public class User
 	private int id;
 	private String email;
 	private String pwd;
+
 	
 	
 	@Override
@@ -49,7 +50,6 @@ public class User
 	public void setPwd(String pwd) {
 		this.pwd = pwd;
 	}
-	
-	
+		
 
 }

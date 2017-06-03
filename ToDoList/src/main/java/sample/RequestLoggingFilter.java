@@ -2,6 +2,7 @@ package sample;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.Filter;
@@ -13,6 +14,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.mysql.fabric.xmlrpc.base.Array;
 
 /**
  * Servlet Filter implementation class RequestLoggingFilter
@@ -38,28 +41,33 @@ public class RequestLoggingFilter implements Filter {
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException 
 	{
-		HttpServletRequest req = (HttpServletRequest) request;
-		HttpServletResponse res = (HttpServletResponse) response;
-		HttpSession session = req.getSession(true);
-		String requestURI = req.getRequestURI();
-		List<String> defaultURI = new ArrayList<String>();
-		defaultURI.add("LoginPage.jsp");
-		defaultURI.add("LoginServlet.jsp");
+		HttpSession session = ((HttpServletRequest) request).getSession(true);
+		String requestURI = ((HttpServletRequest) request).getRequestURI();
+		Boolean defaultPage = false;
+		List<String> defaultURI = Arrays.asList("/ToDoList/LoginPage.jsp","/ToDoList/LoginServlet");
+		
 		for(String uri: defaultURI)
 		{
 			if(uri.equals(requestURI))
-				chain.doFilter(req, res);
+			{
+				defaultPage = true;
+				break;
+			}
+		}
+			if(defaultPage)
+			{
+				chain.doFilter(request, response);
+			}
 			else
 			{				
-				Object loginUser = session.getAttribute("LOGIN_USER");
+				Object loginUser = session.getAttribute("USER_LOGIN");				
 				if(loginUser != null)
-					chain.doFilter(req, res);
+					chain.doFilter(request, response);
 				else
-					((HttpServletResponse) response).sendRedirect("LoginPage.jsp");
-				
+					((HttpServletResponse) response).sendRedirect("LoginPage.jsp");				
 			}			
 		}
-	}
+	
 
 	/**
 	 * @see Filter#init(FilterConfig)

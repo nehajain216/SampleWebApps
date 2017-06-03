@@ -12,43 +12,33 @@ import javax.servlet.http.HttpSession;
  */
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
     /**
      * Default constructor. 
      */
     public LoginServlet() {
         // TODO Auto-generated constructor stub
     }
-	
+	private TodoService todoService = new TodoService();
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
-		String uemail = request.getParameter("email");	
-		String upwd = request.getParameter("pwd");	
+		String email = request.getParameter("email");	
+		String password = request.getParameter("pwd");	
 		
-		boolean validUser = DBUtil.isUserCredentialValid(uemail,upwd);
-		if(validUser)
-		{
+		User user= todoService.login(email, password);
+		
+		if(user !=null)
+		{			
 			HttpSession session = request.getSession(true);
-			session.setAttribute("USER_LOGIN", uemail);
-			response.sendRedirect("MainPage.jsp");			
+			session.setAttribute("USER_LOGIN", user);
+			response.sendRedirect("MainPageServlet");			
 		}
 		else
-		{
-			boolean existingUser = DBUtil.isUserExist(uemail);
-			if(existingUser)
-			{
-				// print a message in login page stating plese check the credentails
-			}
-			else
-			{
-				// print user does not exist. please create an account.
-			}
-			response.sendRedirect("LoginPage.jsp");
-			
+		{			
+			response.sendRedirect("LoginPage.jsp");			
 		}
 	}
 
